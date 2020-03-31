@@ -34,4 +34,4 @@ jobs:
         with:
           coverageCommand: make test-coverage 
           coverageLocations:
-            "${{github.workspace}}/coverage/icov.info"
+            "${{github.workspace}}/coverage/lcov.info"
