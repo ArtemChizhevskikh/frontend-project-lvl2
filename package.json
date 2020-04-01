@@ -35,6 +35,8 @@
   "homepage": "https://github.com/ArtemChizhevskikh/frontend-project-lvl2#readme",
   "dependencies": {
     "commander": "^5.0.0",
+    "ini": "^1.3.5",
+    "js-yaml": "^3.13.1",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
