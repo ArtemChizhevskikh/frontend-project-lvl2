@@ -9,6 +9,6 @@ const parsers = {
 };
 
 export default (pathToFile) => {
-  const format = path.extname(pathToFile);
-  return parsers[format];
+  const extension = path.extname(pathToFile);
+  return parsers[extension];
 };
