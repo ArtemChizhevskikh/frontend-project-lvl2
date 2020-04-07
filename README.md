@@ -21,6 +21,8 @@ INI files:
 
 ### Files with recursive structure comparasion:
 
+**String format**:
+
 JSON files:
 ![Alt text](https://github.com/ArtemChizhevskikh/projectsDemo/blob/master/genDiff/recursiveJSON.svg)
 
@@ -29,3 +31,14 @@ YAML files:
 
 INI files:
 ![Alt text](https://github.com/ArtemChizhevskikh/projectsDemo/blob/master/genDiff/recursiveINI.svg)
+
+**Plain text format**:
+
+JSON files:
+![Alt text](https://github.com/ArtemChizhevskikh/projectsDemo/blob/master/genDiff/plainTextJSON.svg)
+
+YAML files:
+![Alt text](https://github.com/ArtemChizhevskikh/projectsDemo/blob/master/genDiff/plainTextYAML.svg)
+
+INI files:
+![Alt text](https://github.com/ArtemChizhevskikh/projectsDemo/blob/master/genDiff/plainTextINI.svg)
