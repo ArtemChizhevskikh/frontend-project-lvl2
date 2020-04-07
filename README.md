@@ -11,7 +11,7 @@ Compare two config files and get the difference
 ### Files with plain structure comparasion:
 
 JSON files:
-<script id="asciicast-R2SWL0S8VJF15TGukQnCwcbVz" src="https://asciinema.org/a/R2SWL0S8VJF15TGukQnCwcbVz.js" async></script>
+![Alt text](https://github.com/ArtemChizhevskikh/projectsDemo/blob/master/genDiff/plainJSON.svg)
 
 YAML files:
 ![Alt text](https://github.com/ArtemChizhevskikh/projectsDemo/blob/master/genDiff/plainYAML.svg)
@@ -22,10 +22,15 @@ INI files:
 ### Files with recursive structure comparasion:
 
 **Treelike format**:
+
 [![asciicast](https://asciinema.org/a/R2SWL0S8VJF15TGukQnCwcbVz.svg)](https://asciinema.org/a/R2SWL0S8VJF15TGukQnCwcbVz)
 
+
 **Plain text format**:
+
 [![asciicast](https://asciinema.org/a/2Qq6ZFqf68iD2CEZzAVU6ylwR.svg)](https://asciinema.org/a/2Qq6ZFqf68iD2CEZzAVU6ylwR)
 
+
 **JSON format**:
+
 [![asciicast](https://asciinema.org/a/VUCOQVvLjIveJF92uh002E0f5.svg)](https://asciinema.org/a/VUCOQVvLjIveJF92uh002E0f5)
