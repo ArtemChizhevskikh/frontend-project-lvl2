@@ -1,9 +1,10 @@
-import toPlainText from './plain.js';
+import makePlain from './plain.js';
 import stringify from './stringify.js';
 
 const formatters = {
-  string: stringify,
-  plain: toPlainText,
+  treelike: stringify,
+  plain: makePlain,
+  json: JSON.stringify,
 };
 
 export default (format) => formatters[format];

@@ -32,10 +32,15 @@ const iter = (data, depth = 1) => {
       return [`${indent}${node.key}: {`, iter(node.children, depth + 1).join('\n'), `${indent}}`];
     }
     if (node.status === 'changed') {
-      return [`${stringifyKey(node.key, depth, 'deleted')}: ${stringifyValue(node.oldValue, depth)}`,
-        `${stringifyKey(node.key, depth, 'added')}: ${stringifyValue(node.newValue, depth)}`];
+      const deletedKey = stringifyKey(node.key, depth, 'deleted');
+      const addedKey = stringifyKey(node.key, depth, 'added');
+      const oldValue = stringifyValue(node.oldValue, depth);
+      const newValue = stringifyValue(node.newValue, depth);
+      return [`${deletedKey}: ${oldValue}`, `${addedKey}: ${newValue}`];
     }
-    return [`${stringifyKey(node.key, depth, node.status)}: ${stringifyValue(node.value, depth)}`];
+    const processedKey = stringifyKey(node.key, depth, node.status);
+    const processedValue = stringifyValue(node.value, depth);
+    return [`${processedKey}: ${processedValue}`];
   });
 };
 

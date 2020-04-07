@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import process from 'process';
-import { has, isObject } from 'lodash';
+import { has, isObject, mapValues } from 'lodash';
 import getRenderer from './formatters/index.js';
 import getParser from './parsers.js';
 
@@ -11,24 +11,33 @@ const readFile = (pathToFile) => {
   return fileData;
 };
 
+const processValue = (value) => {
+  if (isObject(value)) {
+    const newValue = mapValues(value, processValue);
+    return newValue;
+  }
+  if (Number.isNaN(parseInt(value, 10))) {
+    return value;
+  }
+  return parseInt(value, 10);
+};
+
 const iterDiffAst = (node1, node2) => {
   const keys = Object.keys({ ...node1, ...node2 }).sort();
   return keys.flatMap((key) => {
     if (!has(node1, key)) {
-      return { key, value: node2[key], status: 'added' };
+      return { key, value: processValue(node2[key]), status: 'added' };
     }
     if (!has(node2, key)) {
-      return { key, value: node1[key], status: 'deleted' };
+      return { key, value: processValue(node1[key]), status: 'deleted' };
     }
     if (isObject(node1[key]) && isObject(node2[key])) {
       return { key, children: iterDiffAst(node1[key], node2[key]), status: 'unchanged' };
     }
-    if ((node1[key] === node2[key])) {
-      return { key, value: node1[key], status: 'unchanged' };
-    }
-    return {
-      key, oldValue: node1[key], newValue: node2[key], status: 'changed',
-    };
+    return (node1[key] === node2[key]) ? { key, value: processValue(node1[key]), status: 'unchanged' }
+      : {
+        key, oldValue: processValue(node1[key]), newValue: processValue(node2[key]), status: 'changed',
+      };
   });
 };
 
