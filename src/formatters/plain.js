@@ -1,6 +1,5 @@
 import { has, isObject } from 'lodash';
 
-
 const processValue = (value) => {
   if (isObject(value)) {
     return '[complex value]';
@@ -32,4 +31,4 @@ const iter = (data, currentPath = '') => data.reduce((acc, node) => {
   return [...acc, stringifyNode(node, newCurrentPath, node.status)];
 }, []);
 
-export default (data) => iter(data).sort().join('\n');
+export default (data) => iter(data).join('\n');

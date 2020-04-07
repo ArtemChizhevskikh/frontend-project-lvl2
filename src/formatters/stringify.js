@@ -2,11 +2,11 @@ import { has, isObject } from 'lodash';
 
 const makeIndent = (depth) => '    '.repeat(depth);
 
-const stringifyKey = (key, depth, message) => {
-  const indentLength = makeIndent(depth).length;
+const stringifyKey = (key, indent, message) => {
+  const indentLength = indent.length;
   switch (message) {
     case 'unchanged':
-      return `${makeIndent(depth)}${key}`;
+      return `${indent}${key}`;
     case 'deleted':
       return `${'- '.padStart(indentLength)}${key}`;
     case 'added':
@@ -22,23 +22,24 @@ const stringifyValue = (value, depth) => {
       .map(([k, v]) => `{\n${makeIndent(depth + 1)}${k}: ${v}\n${makeIndent(depth)}}`);
     return result;
   }
-  return `${value}`;
+  return value;
 };
 
 const iter = (data, depth = 1) => {
   const indent = makeIndent(depth);
   return data.flatMap((node) => {
     if (has(node, 'children')) {
-      return [`${indent}${node.key}: {`, iter(node.children, depth + 1).join('\n'), `${indent}}`];
+      const processedKey = stringifyKey(node.key, indent, node.status);
+      return [`${processedKey}: {`, iter(node.children, depth + 1).join('\n'), `${indent}}`];
     }
     if (node.status === 'changed') {
-      const deletedKey = stringifyKey(node.key, depth, 'deleted');
-      const addedKey = stringifyKey(node.key, depth, 'added');
+      const deletedKey = stringifyKey(node.key, indent, 'deleted');
+      const addedKey = stringifyKey(node.key, indent, 'added');
       const oldValue = stringifyValue(node.oldValue, depth);
       const newValue = stringifyValue(node.newValue, depth);
       return [`${deletedKey}: ${oldValue}`, `${addedKey}: ${newValue}`];
     }
-    const processedKey = stringifyKey(node.key, depth, node.status);
+    const processedKey = stringifyKey(node.key, indent, node.status);
     const processedValue = stringifyValue(node.value, depth);
     return [`${processedKey}: ${processedValue}`];
   });

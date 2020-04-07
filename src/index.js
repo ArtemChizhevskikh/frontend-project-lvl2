@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { has, isObject, mapValues } from 'lodash';
-import getRenderer from './formatters/index.js';
+import getFormatter from './formatters/index.js';
 import getParser from './parsers.js';
 
 const readFile = (pathToFile) => {
@@ -26,17 +26,21 @@ const iterDiffAst = (node1, node2) => {
   const keys = Object.keys({ ...node1, ...node2 }).sort();
   return keys.flatMap((key) => {
     if (!has(node1, key)) {
-      return { key, value: processValue(node2[key]), status: 'added' };
+      const value = processValue(node2[key]);
+      return { key, value, status: 'added' };
     }
     if (!has(node2, key)) {
-      return { key, value: processValue(node1[key]), status: 'deleted' };
+      const value = processValue(node1[key]);
+      return { key, value, status: 'deleted' };
     }
     if (isObject(node1[key]) && isObject(node2[key])) {
       return { key, children: iterDiffAst(node1[key], node2[key]), status: 'unchanged' };
     }
-    return (node1[key] === node2[key]) ? { key, value: processValue(node1[key]), status: 'unchanged' }
+    const oldValue = processValue(node1[key]);
+    const newValue = processValue(node2[key]);
+    return (oldValue === newValue) ? { key, value: oldValue, status: 'unchanged' }
       : {
-        key, oldValue: processValue(node1[key]), newValue: processValue(node2[key]), status: 'changed',
+        key, oldValue, newValue, status: 'changed',
       };
   });
 };
@@ -47,7 +51,7 @@ const genDiff = (path1, path2, format) => {
   const config1 = getParser(path1)(data1);
   const config2 = getParser(path2)(data2);
   const diff = iterDiffAst(config1, config2);
-  return getRenderer(format)(diff);
+  return getFormatter(format)(diff);
 };
 
 export default genDiff;
