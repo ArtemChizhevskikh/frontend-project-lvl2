@@ -20,10 +20,10 @@ const stringifyNode = (node, path, message) => {
   }
 };
 
-const iter = (data, currentPath = '') => data.reduce((acc, node) => {
+const makeDataPlain = (data, currentPath = '') => data.reduce((acc, node) => {
   const newCurrentPath = [...currentPath, node.key];
   if (has(node, 'children')) {
-    return [...acc, ...iter(node.children, newCurrentPath)];
+    return [...acc, ...makeDataPlain(node.children, newCurrentPath)];
   }
   if (node.status === 'unchanged') {
     return acc;
@@ -31,4 +31,4 @@ const iter = (data, currentPath = '') => data.reduce((acc, node) => {
   return [...acc, stringifyNode(node, newCurrentPath, node.status)];
 }, []);
 
-export default (data) => iter(data).join('\n');
+export default (data) => makeDataPlain(data).join('\n');

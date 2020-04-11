@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import process from 'process';
-import { has, isObject, mapValues } from 'lodash';
-import getFormatter from './formatters/index.js';
-import getParser from './parsers.js';
+import _ from 'lodash';
+import render from './formatters/index.js';
+import parse from './parsers.js';
 
 const readFile = (pathToFile) => {
   const fullPath = path.resolve(process.cwd(), `${pathToFile}`);
@@ -11,33 +11,28 @@ const readFile = (pathToFile) => {
   return fileData;
 };
 
-const processValue = (value) => {
-  if (isObject(value)) {
-    const newValue = mapValues(value, processValue);
-    return newValue;
-  }
-  if (Number.isNaN(parseInt(value, 10))) {
-    return value;
-  }
-  return parseInt(value, 10);
+const getDataType = (pathToFile) => {
+  const extension = path.extname(pathToFile);
+  const dataType = extension.slice(1);
+  return dataType;
 };
 
-const iterDiffAst = (node1, node2) => {
-  const keys = Object.keys({ ...node1, ...node2 }).sort();
+const buildDiffAst = (node1, node2) => {
+  const keys = _.union(_.keys(node1), _.keys(node2)).sort();
   return keys.flatMap((key) => {
-    if (!has(node1, key)) {
-      const value = processValue(node2[key]);
+    if (!_.has(node1, key)) {
+      const value = node2[key];
       return { key, value, status: 'added' };
     }
-    if (!has(node2, key)) {
-      const value = processValue(node1[key]);
+    if (!_.has(node2, key)) {
+      const value = node1[key];
       return { key, value, status: 'deleted' };
     }
-    if (isObject(node1[key]) && isObject(node2[key])) {
-      return { key, children: iterDiffAst(node1[key], node2[key]), status: 'unchanged' };
+    if (_.isObject(node1[key]) && _.isObject(node2[key])) {
+      return { key, children: buildDiffAst(node1[key], node2[key]), status: 'unchanged' };
     }
-    const oldValue = processValue(node1[key]);
-    const newValue = processValue(node2[key]);
+    const oldValue = node1[key];
+    const newValue = node2[key];
     return (oldValue === newValue) ? { key, value: oldValue, status: 'unchanged' }
       : {
         key, oldValue, newValue, status: 'changed',
@@ -48,10 +43,10 @@ const iterDiffAst = (node1, node2) => {
 const genDiff = (path1, path2, format) => {
   const data1 = readFile(path1);
   const data2 = readFile(path2);
-  const config1 = getParser(path1)(data1);
-  const config2 = getParser(path2)(data2);
-  const diff = iterDiffAst(config1, config2);
-  return getFormatter(format)(diff);
+  const config1 = parse(data1, getDataType(path1));
+  const config2 = parse(data2, getDataType(path2));
+  const diff = buildDiffAst(config1, config2);
+  return render(diff, format);
 };
 
 export default genDiff;

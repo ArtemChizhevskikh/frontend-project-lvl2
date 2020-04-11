@@ -16,21 +16,26 @@ const stringifyKey = (key, indent, message) => {
   }
 };
 
+const stringifyObject = (object, depth) => {
+  const objectEntries = Object.entries(object);
+  return objectEntries
+    .map(([key, value]) => `{\n${makeIndent(depth + 1)}${key}: ${value}\n${makeIndent(depth)}}`);
+};
+
 const stringifyValue = (value, depth) => {
   if (isObject(value)) {
-    const result = Object.entries(value)
-      .map(([k, v]) => `{\n${makeIndent(depth + 1)}${k}: ${v}\n${makeIndent(depth)}}`);
-    return result;
+    return stringifyObject(value, depth);
   }
   return value;
 };
 
-const iter = (data, depth = 1) => {
+const stringifyData = (data, depth = 1) => {
   const indent = makeIndent(depth);
   return data.flatMap((node) => {
     if (has(node, 'children')) {
       const processedKey = stringifyKey(node.key, indent, node.status);
-      return [`${processedKey}: {`, iter(node.children, depth + 1).join('\n'), `${indent}}`];
+      const processedChildren = stringifyData(node.children, depth + 1).join('\n');
+      return [`${processedKey}: {`, processedChildren, `${indent}}`];
     }
     if (node.status === 'changed') {
       const deletedKey = stringifyKey(node.key, indent, 'deleted');
@@ -45,4 +50,7 @@ const iter = (data, depth = 1) => {
   });
 };
 
-export default (data) => `{\n${(iter(data)).join('\n')}\n}`;
+export default (data) => {
+  const processedData = stringifyData(data).join('\n');
+  return `{\n${processedData}\n}`;
+};
