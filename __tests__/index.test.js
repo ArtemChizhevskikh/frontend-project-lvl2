@@ -3,11 +3,11 @@ import fs from 'fs';
 import genDiff from '../src/index.js';
 
 
-const extensions = [['.json', 'treelike'], ['.yml', 'treelike'], ['.ini', 'treelike'],
-  ['.json', 'plain'], ['.yml', 'plain'], ['.ini', 'plain'],
-  ['.json', 'json'], ['.yml', 'json'], ['.ini', 'json']];
+const extensions = [['json', 'treelike'], ['yml', 'treelike'], ['ini', 'treelike'],
+  ['json', 'plain'], ['yml', 'plain'], ['ini', 'plain'],
+  ['json', 'json'], ['yml', 'json'], ['ini', 'json']];
 
-const getFullPath = (file, extension = '.txt') => path.resolve(__dirname, 'fixtures', `${file}${extension}`);
+const getFullPath = (filename, extension = 'txt') => path.resolve(__dirname, 'fixtures', `${filename}.${extension}`);
 
 test.each(extensions)('compare %s files in %s format', (extension, format) => {
   const path1 = getFullPath('before', extension);
