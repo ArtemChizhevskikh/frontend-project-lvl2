@@ -1,13 +1,13 @@
-import { has, isObject } from 'lodash';
-
-const processValue = (value) => {
-  if (isObject(value)) {
-    return '[complex value]';
-  }
-  return (typeof value === 'string') ? `'${value}'` : value;
-};
+import { isObject } from 'lodash';
 
 const stringifyNode = (node, path, message) => {
+  const processValue = (value) => {
+    if (isObject(value)) {
+      return '[complex value]';
+    }
+    return (typeof value === 'string') ? `'${value}'` : value;
+  };
+
   switch (message) {
     case 'added':
       return `Property '${path.join('.')}' was added with value: ${processValue(node.value)}`;
@@ -22,13 +22,13 @@ const stringifyNode = (node, path, message) => {
 
 const makeDataPlain = (data, currentPath = '') => data.reduce((acc, node) => {
   const newCurrentPath = [...currentPath, node.key];
-  if (has(node, 'children')) {
+  if (node.type === 'parent') {
     return [...acc, ...makeDataPlain(node.children, newCurrentPath)];
   }
-  if (node.status === 'unchanged') {
+  if (node.type === 'unchanged') {
     return acc;
   }
-  return [...acc, stringifyNode(node, newCurrentPath, node.status)];
+  return [...acc, stringifyNode(node, newCurrentPath, node.type)];
 }, []);
 
 export default (data) => makeDataPlain(data).join('\n');

@@ -1,5 +1,5 @@
 import makePlain from './plain.js';
-import stringify from './stringify.js';
+import stringify from './treelike.js';
 
 const formatters = {
   treelike: stringify,
@@ -8,6 +8,6 @@ const formatters = {
 };
 
 export default (data, format) => {
-  const formatter = formatters[format];
-  return formatter(data);
+  const render = formatters[format];
+  return render(data);
 };
