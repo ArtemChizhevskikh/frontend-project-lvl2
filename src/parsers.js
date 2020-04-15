@@ -2,12 +2,6 @@ import yaml from 'js-yaml';
 import ini from 'ini';
 import { isObject, mapValues } from 'lodash';
 
-const parsers = {
-  json: JSON.parse,
-  yml: yaml.safeLoad,
-  ini: ini.parse,
-};
-
 const processValue = (value) => {
   if (isObject(value)) {
     const newValue = mapValues(value, processValue);
@@ -19,9 +13,18 @@ const processValue = (value) => {
   return parseInt(value, 10);
 };
 
+const iniParse = (data) => {
+  const config = ini.parse(data);
+  return mapValues(config, processValue);
+};
+
+const parsers = {
+  json: JSON.parse,
+  yml: yaml.safeLoad,
+  ini: iniParse,
+};
+
 export default (data, dataType) => {
-  const parser = parsers[dataType];
-  const config = parser(data);
-  const processedConfig = (dataType === 'ini') ? mapValues(config, processValue) : config;
-  return processedConfig;
+  const parse = parsers[dataType];
+  return parse(data);
 };
