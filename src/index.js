@@ -22,21 +22,23 @@ const buildDiffAst = (node1, node2) => {
   return keys.flatMap((key) => {
     if (!_.has(node1, key)) {
       const value = node2[key];
-      return { key, value, status: 'added' };
+      return { key, value, type: 'added' };
     }
     if (!_.has(node2, key)) {
       const value = node1[key];
-      return { key, value, status: 'deleted' };
+      return { key, value, type: 'deleted' };
     }
     if (_.isObject(node1[key]) && _.isObject(node2[key])) {
-      return { key, children: buildDiffAst(node1[key], node2[key]), status: 'unchanged' };
+      return { key, children: buildDiffAst(node1[key], node2[key]), type: 'parent' };
     }
     const oldValue = node1[key];
     const newValue = node2[key];
-    return (oldValue === newValue) ? { key, value: oldValue, status: 'unchanged' }
-      : {
-        key, oldValue, newValue, status: 'changed',
-      };
+    if (oldValue === newValue) {
+      return { key, value: oldValue, type: 'unchanged' };
+    }
+    return {
+      key, oldValue, newValue, type: 'changed',
+    };
   });
 };
 
