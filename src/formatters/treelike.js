@@ -2,48 +2,33 @@ import { isObject } from 'lodash';
 
 const makeIndent = (depth) => '    '.repeat(depth);
 
-const stringifyNode = (node, depth) => {
-  const indent = makeIndent(depth);
-  const stringifyObject = (object) => {
-    const objectEntries = Object.entries(object);
-    return objectEntries
-      .map(([key, value]) => `{\n${makeIndent(depth + 1)}${key}: ${value}\n${makeIndent(depth)}}`);
-  };
-
-  const stringifyValue = (value) => {
-    if (isObject(value)) {
-      return stringifyObject(value);
-    }
-    return value;
-  };
-
-  const deletedKey = `${'- '.padStart(indent.length)}${node.key}`;
-  const addedKey = `${'+ '.padStart(indent.length)}${node.key}`;
-
-  switch (node.type) {
-    case 'unchanged':
-      return `${indent}${node.key}: ${stringifyValue(node.value)}`;
-    case 'changed':
-      return `${deletedKey}: ${stringifyValue(node.oldValue)}\n${addedKey}: ${stringifyValue(node.newValue)}`;
-    case 'deleted':
-      return `${deletedKey}: ${stringifyValue(node.value)}`;
-    case 'added':
-      return `${addedKey}: ${stringifyValue(node.value)}`;
-    default:
-      throw new Error(`Unknown message ${node.type}!`);
+const stringifyValue = (value, depth) => {
+  if (isObject(value)) {
+    const valueEntries = Object.entries(value);
+    return valueEntries
+      .map(([key, val]) => `{\n${makeIndent(depth + 1)}${key}: ${val}\n${makeIndent(depth)}}`);
   }
+  return value;
 };
 
 const stringifyData = (data, depth = 1) => data.map((node) => {
   const indent = makeIndent(depth);
-  if (node.type === 'parent') {
-    const processedChildren = stringifyData(node.children, depth + 1).join('\n');
-    return `${indent}${node.key}: {\n${processedChildren}\n${indent}}`;
+  const deletedKey = `${'- '.padStart(indent.length)}${node.key}`;
+  const addedKey = `${'+ '.padStart(indent.length)}${node.key}`;
+  switch (node.type) {
+    case 'parent':
+      return `${indent}${node.key}: {\n${stringifyData(node.children, depth + 1).join('\n')}\n${indent}}`;
+    case 'unchanged':
+      return `${indent}${node.key}: ${stringifyValue(node.value, depth)}`;
+    case 'changed':
+      return `${deletedKey}: ${stringifyValue(node.oldValue, depth)}\n${addedKey}: ${stringifyValue(node.newValue, depth)}`;
+    case 'deleted':
+      return `${deletedKey}: ${stringifyValue(node.value, depth)}`;
+    case 'added':
+      return `${addedKey}: ${stringifyValue(node.value, depth)}`;
+    default:
+      throw new Error(`Unknown message ${node.type}!`);
   }
-  if (node.type === 'changed') {
-    return stringifyNode(node, depth);
-  }
-  return stringifyNode(node, depth);
 });
 
 export default (data) => {
