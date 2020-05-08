@@ -3,12 +3,12 @@ import { isObject } from 'lodash';
 const makeIndent = (depth) => '    '.repeat(depth);
 
 const stringifyValue = (value, depth) => {
-  if (isObject(value)) {
-    const valueEntries = Object.entries(value);
-    return valueEntries
-      .map(([key, val]) => `{\n${makeIndent(depth + 1)}${key}: ${val}\n${makeIndent(depth)}}`);
+  if (!isObject(value)) {
+    return value;
   }
-  return value;
+  const valueEntries = Object.entries(value);
+  return valueEntries
+    .map(([key, val]) => `{\n${makeIndent(depth + 1)}${key}: ${val}\n${makeIndent(depth)}}`);
 };
 
 const stringifyData = (data, depth = 1) => data.map((node) => {
